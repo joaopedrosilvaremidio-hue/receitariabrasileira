@@ -18,15 +18,10 @@ export default function Home() {
             <span className="rounded-lg bg-red-600 p-2"><ChefHat size={20} /></span>
             Recei<span className="text-red-500">taria</span>
           </Link>
-          <nav className="hidden items-center gap-7 text-sm text-zinc-300 md:flex">
+          <nav className="flex items-center gap-5 text-sm text-zinc-300">
             <a href="#receitas" className="hover:text-white">Receitas</a>
             <a href="#categorias" className="hover:text-white">Categorias</a>
-            <a href="#assinatura" className="hover:text-white">Assinatura</a>
           </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm font-medium text-zinc-300 hover:text-white">Entrar</Link>
-            <Link href="/assinar" className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold hover:bg-red-700">Assinar</Link>
-          </div>
         </div>
       </header>
 
@@ -36,10 +31,9 @@ export default function Home() {
           <h1 className="max-w-xl text-4xl font-extrabold leading-tight md:text-6xl">Aprenda a cozinhar com <span className="text-red-500">confiança.</span></h1>
           <p className="mt-5 max-w-lg text-lg leading-8 text-zinc-400">Receitas explicadas passo a passo, feitas para quem está começando na cozinha.</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/assinar" className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-3 font-semibold hover:bg-red-700">Começar agora <ArrowRight size={18}/></Link>
-            <a href="#receitas" className="rounded-lg border border-white/15 px-5 py-3 font-semibold hover:bg-white/5">Conhecer receitas</a>
+            <a href="#receitas" className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-3 font-semibold hover:bg-red-700">Explorar receitas <ArrowRight size={18}/></a>
+            <a href="#categorias" className="rounded-lg border border-white/15 px-5 py-3 font-semibold hover:bg-white/5">Ver categorias</a>
           </div>
-          <p className="mt-4 text-sm text-zinc-500">Acesso completo por R$ 19,90/mês.</p>
         </div>
         <div className="relative rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-6 md:p-10">
           <div className="absolute right-6 top-6 rounded-full bg-red-600/15 p-3 text-red-400"><ChefHat size={24}/></div>
@@ -53,9 +47,9 @@ export default function Home() {
       </section>
 
       <section id="categorias" className="mx-auto max-w-7xl px-5 py-10">
-        <div className="flex items-end justify-between"><div><p className="text-sm font-semibold text-red-500">EXPLORE</p><h2 className="mt-2 text-2xl font-bold md:text-3xl">O que você quer preparar?</h2></div></div>
+        <div><p className="text-sm font-semibold text-red-500">EXPLORE</p><h2 className="mt-2 text-2xl font-bold md:text-3xl">O que você quer preparar?</h2></div>
         <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-          {categories.map((category) => <button key={category} className="rounded-xl border border-white/10 bg-zinc-900 px-4 py-5 text-left font-semibold transition hover:border-red-500/50 hover:bg-zinc-800">{category}<span className="mt-2 block text-sm font-normal text-zinc-500">Ver receitas →</span></button>)}
+          {categories.map((category) => <a key={category} href="#receitas" className="rounded-xl border border-white/10 bg-zinc-900 px-4 py-5 text-left font-semibold transition hover:border-red-500/50 hover:bg-zinc-800">{category}<span className="mt-2 block text-sm font-normal text-zinc-500">Ver receitas →</span></a>)}
         </div>
       </section>
 
@@ -67,15 +61,7 @@ export default function Home() {
             <div className="p-5"><div className="flex items-center justify-between text-xs text-zinc-500"><span>{recipe.category}</span><span>{recipe.time}</span></div><h3 className="mt-2 text-lg font-bold">{recipe.name}</h3><p className="mt-1 text-sm text-zinc-400">Passo a passo simples para iniciantes.</p><div className="mt-4 flex items-center justify-between"><span className="rounded-full bg-green-500/10 px-2.5 py-1 text-xs text-green-400">{recipe.difficulty}</span><Heart size={18} className="text-zinc-500"/></div></div>
           </article>)}
         </div>
-        <p className="mt-5 text-center text-sm text-zinc-500">Prévia ilustrativa. As receitas completas serão liberadas para assinantes.</p>
-      </section>
-
-      <section id="assinatura" className="mx-5 mb-16 rounded-3xl border border-red-500/20 bg-gradient-to-br from-red-950/40 to-zinc-950 px-6 py-12 text-center md:mx-auto md:max-w-5xl">
-        <p className="text-sm font-semibold uppercase tracking-wider text-red-400">Acesso completo</p>
-        <h2 className="mt-3 text-3xl font-extrabold">Sua cozinha. Seu aprendizado.</h2>
-        <p className="mx-auto mt-3 max-w-lg text-zinc-400">Tenha acesso a todas as receitas, instruções detalhadas e favoritos.</p>
-        <p className="mt-6 text-4xl font-extrabold">R$ 19,90 <span className="text-base font-normal text-zinc-400">/ mês</span></p>
-        <Link href="/assinar" className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-semibold hover:bg-red-700">Assinar Receitaria <ArrowRight size={18}/></Link>
+        <p className="mt-5 text-center text-sm text-zinc-500">Receitas organizadas para facilitar seu dia a dia na cozinha.</p>
       </section>
 
       <footer className="border-t border-white/10 px-5 py-8 text-center text-sm text-zinc-500">© {new Date().getFullYear()} Receitaria. Cozinhar pode ser simples.</footer>
