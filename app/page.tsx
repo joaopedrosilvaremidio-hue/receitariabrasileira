@@ -15,6 +15,7 @@ const categories = [
 
 type Recipe = {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   category: string | null;
@@ -31,7 +32,7 @@ async function getRecipes(): Promise<Recipe[]> {
   try {
     const sql = neon(connectionString);
     return await sql`
-      SELECT r.id, r.title, r.description, c.name AS category,
+      SELECT r.id, r.slug, r.title, r.description, c.name AS category,
         r.prep_time_minutes, r.cook_time_minutes, r.difficulty, r.servings, r.image_url
       FROM public.recipes r
       LEFT JOIN public.recipe_categories c ON c.id = r.category_id
@@ -64,7 +65,7 @@ export default async function Home() {
     </section>
     <section id="receitas" className="mx-auto max-w-7xl px-5 py-14"><div className="flex items-end justify-between"><div><p className="text-sm font-semibold text-red-500">RECEITAS CADASTRADAS</p><h2 className="mt-2 text-2xl font-bold md:text-3xl">Receitas para preparar</h2></div><Search className="text-zinc-500"/></div>
       {recipes.length===0 ? <div className="mt-7 rounded-2xl border border-white/10 bg-zinc-900 p-8 text-center"><ChefHat className="mx-auto text-red-500" size={36}/><h3 className="mt-4 text-lg font-bold">Ainda não há receitas publicadas</h3><p className="mt-2 text-sm text-zinc-400">As receitas aparecerão aqui quando forem cadastradas.</p></div> :
-      <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{recipes.map(r=>{const total=(r.prep_time_minutes??0)+(r.cook_time_minutes??0);return <article key={r.id} className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
+      <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{recipes.map(r=>{const total=(r.prep_time_minutes??0)+(r.cook_time_minutes??0);return <Link href={`/receita/${r.slug}`} key={r.id} className="group block overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 transition hover:-translate-y-1 hover:border-red-500/50 hover:shadow-xl hover:shadow-red-950/20">
         {r.image_url ? <img src={r.image_url} alt={r.title} className="aspect-[16/9] w-full object-cover"/> : <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-red-950 via-zinc-900 to-zinc-950 text-6xl">🍽️</div>}
         <div className="p-5"><div className="flex items-center justify-between text-xs text-zinc-500"><span>{r.category||"Receita"}</span>{total>0&&<span>{total} min</span>}</div><h3 className="mt-2 text-lg font-bold">{r.title}</h3><p className="mt-1 text-sm text-zinc-400">{r.description||"Confira os ingredientes e o modo de preparo."}</p><div className="mt-4 flex items-center justify-between text-sm text-zinc-400"><span>{r.difficulty}</span><span>{r.servings} porção(ões)</span></div></div>
       </article>})}</div>}
