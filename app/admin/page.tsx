@@ -38,6 +38,7 @@ export default function AdminPage() {
       if (!response.ok) throw new Error(data.error || "Erro ao carregar.");
       setRecipes(data.recipes || []);
       setCategories(data.categories || []);
+      setRole(data.role || "admin");
       setLoggedIn(true);
     } catch (e) { setMessage(e instanceof Error ? e.message : "Erro inesperado."); }
     finally { setLoading(false); }
