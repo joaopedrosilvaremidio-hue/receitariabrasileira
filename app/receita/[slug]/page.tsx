@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { neon } from "@neondatabase/serverless";
-import { ChefHat, ArrowLeft, Clock3, Users, Utensils, ListChecks } from "lucide-react";
+import { ChefHat, ArrowLeft, Clock3, Utensils, ListChecks } from "lucide-react";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 type Ingredient = { ingredient_name: string; quantity: string | null };
 type Recipe = {
   id: string; title: string; description: string | null; category: string | null;
-  prep_time_minutes: number | null; cook_time_minutes: number | null; servings: number;
+  prep_time_minutes: number | null; cook_time_minutes: number | null;
   difficulty: string | null; image_url: string | null;
 };
 
@@ -19,7 +19,7 @@ export default async function RecipeDetails({ params }: { params: Promise<{ slug
   const sql = neon(connectionString);
   const rows = await sql`
     SELECT r.id, r.title, r.description, c.name AS category, r.prep_time_minutes,
-      r.cook_time_minutes, r.servings, r.difficulty, r.image_url
+      r.cook_time_minutes, r.difficulty, r.image_url
     FROM public.recipes r LEFT JOIN public.recipe_categories c ON c.id = r.category_id
     WHERE r.slug = ${slug} AND r.published = true LIMIT 1
   `;
@@ -45,7 +45,6 @@ export default async function RecipeDetails({ params }: { params: Promise<{ slug
       {recipe.description && <p className="mt-4 max-w-3xl text-lg leading-8 text-zinc-400">{recipe.description}</p>}
       <div className="mt-6 flex flex-wrap gap-3 text-sm text-zinc-300">
         <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900 px-4 py-2"><Clock3 size={16} className="text-red-400"/>{totalTime ? totalTime+" min" : "Tempo não informado"}</span>
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900 px-4 py-2"><Users size={16} className="text-red-400"/>{recipe.servings || 1} porção(ões)</span>
         {recipe.difficulty && <span className="rounded-full border border-white/10 bg-zinc-900 px-4 py-2">Nível: {recipe.difficulty}</span>}
       </div>
       {recipe.image_url ? <img src={recipe.image_url} alt={recipe.title} className="mt-8 max-h-[460px] w-full rounded-2xl object-cover"/> : <div className="mt-8 flex h-56 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-red-950 via-zinc-900 to-black text-7xl">🍲</div>}
