@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
-import { isAdmin } from "@/lib/admin-auth";
+import { isAdmin, getAdminSession } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,7 +27,8 @@ export async function GET() {
       ORDER BY r.created_at DESC
     `;
     const categories = await sql`SELECT id, name, slug FROM public.recipe_categories ORDER BY name`;
-    return NextResponse.json({ recipes, categories });
+    const session = await getAdminSession();
+    return NextResponse.json({ recipes, categories, role: session?.role || "admin" });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Erro ao consultar receitas." }, { status: 500 });
