@@ -26,7 +26,7 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     title: "", description: "", category_id: "", prep_time_minutes: "10", cook_time_minutes: "20",
-    servings: "2", difficulty: "fácil", image_url: "", ingredientsText: "", stepsText: "", published: true,
+    difficulty: "fácil", image_url: "", ingredientsText: "", stepsText: "", published: true,
   });
 
   async function load() {
@@ -73,13 +73,13 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/recipes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         title: form.title, description: form.description, category_id: form.category_id,
         prep_time_minutes: form.prep_time_minutes, cook_time_minutes: "0",
-        servings: form.servings, difficulty: form.difficulty, image_url: form.image_url,
+        servings: 1, difficulty: form.difficulty, image_url: form.image_url,
         ingredients, steps, published: form.published,
       })});
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Falha ao salvar.");
       setMessage("Receita cadastrada com sucesso!");
-      setForm({ title: "", description: "", category_id: "", prep_time_minutes: "10", cook_time_minutes: "20", servings: "2", difficulty: "fácil", image_url: "", ingredientsText: "", stepsText: "", published: true });
+      setForm({ title: "", description: "", category_id: "", prep_time_minutes: "10", cook_time_minutes: "20", difficulty: "fácil", image_url: "", ingredientsText: "", stepsText: "", published: true });
       setShowForm(false); await load();
     } catch (e) { setMessage(e instanceof Error ? e.message : "Erro ao cadastrar receita."); }
     finally { setBusy(false); }
@@ -151,7 +151,6 @@ export default function AdminPage() {
           <label className="block text-sm">Nome da receita *<input className={inputClass+" mt-2"} value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="Ex.: Bolo de cenoura" required/></label>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="text-sm">Tempo (minutos)<input className={inputClass+" mt-2"} type="number" min="0" value={form.prep_time_minutes} onChange={e=>setForm({...form,prep_time_minutes:e.target.value})} placeholder="Ex.: 40"/></label>
-            <label className="text-sm">Porção<input className={inputClass+" mt-2"} type="number" min="1" value={form.servings} onChange={e=>setForm({...form,servings:e.target.value})} placeholder="Ex.: 6"/></label>
           </div>
           <label className="block text-sm">Descrição<textarea className={inputClass+" mt-2"} rows={3} value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Descreva a receita em poucas palavras."/></label>
         </section>
