@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
 import { ChefHat, LogOut, Plus, Trash2, Eye, EyeOff, LoaderCircle } from "lucide-react";
 
 type Category = { id: string; name: string; slug: string };
@@ -100,7 +101,7 @@ export default function AdminPage() {
       <input className={inputClass} type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required/>
       {message && <p className="mt-3 text-sm text-red-400">{message}</p>}
       <button disabled={busy} className="mt-5 w-full rounded-xl bg-red-600 px-4 py-3 font-semibold hover:bg-red-700 disabled:opacity-60">{busy ? "Entrando…" : "Entrar"}</button>
-      <a href="/" className="mt-4 block text-center text-sm text-zinc-400 hover:text-white">Voltar ao site</a>
+      <Link href="/" className="mt-4 block text-center text-sm text-zinc-400 hover:text-white">Voltar ao site</Link>
     </form>
   </main>;
 
@@ -108,7 +109,7 @@ export default function AdminPage() {
     <div className="mx-auto max-w-6xl">
       <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3"><span className="rounded-xl bg-red-600 p-3"><ChefHat/></span><div><h1 className="text-2xl font-bold">Painel Receitaria</h1><p className="text-sm text-zinc-400">Gerencie as receitas do seu site</p></div></div>
-        <div className="flex gap-2"><a href="/" className="rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/5">Ver site</a><button onClick={logout} className="flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/5"><LogOut size={16}/> Sair</button></div>
+        <div className="flex gap-2"><Link href="/" className="rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/5">Ver site</Link><button onClick={logout} className="flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/5"><LogOut size={16}/> Sair</button></div>
       </header>
       {message && <div className="mb-5 rounded-xl border border-white/10 bg-zinc-900 p-3 text-sm">{message}</div>}
       <section className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-zinc-900 p-5">
