@@ -1,15 +1,62 @@
 import Link from "next/link";
-import { ChefHat, Search, Heart, Clock3, ArrowRight } from "lucide-react";
+import { neon } from "@neondatabase/serverless";
+import { ChefHat, Search, Clock3, ArrowRight } from "lucide-react";
 
-const categories = ["Café da manhã", "Almoço", "Jantar", "Sobremesas"];
+export const dynamic = "force-dynamic";
 
-const recipes = [
-  { name: "Omelete simples", category: "Café da manhã", time: "10 min", difficulty: "Fácil", emoji: "🍳" },
-  { name: "Arroz soltinho", category: "Acompanhamentos", time: "25 min", difficulty: "Fácil", emoji: "🍚" },
-  { name: "Macarrão cremoso", category: "Almoço", time: "20 min", difficulty: "Fácil", emoji: "🍝" },
+const categories = [
+  { label: "Café da manhã", slug: "cafe-da-manha" },
+  { label: "Almoço", slug: "almoco" },
+  { label: "Jantar", slug: "jantar" },
+  { label: "Sobremesas", slug: "sobremesas" },
+  { label: "Lanches", slug: "lanches" },
+  { label: "Acompanhamentos", slug: "acompanhamentos" },
 ];
 
-export default function Home() {
+type Recipe = {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  prep_time_minutes: number | null;
+  cook_time_minutes: number | null;
+  difficulty: string;
+  servings: number;
+};
+
+async function getRecipes(): Promise<Recipe[]> {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    console.error("DATABASE_URL não está configurada.");
+    return [];
+  }
+
+  try {
+    const sql = neon(connectionString);
+    return await sql`
+      SELECT
+        r.id,
+        r.title,
+        r.description,
+        c.name AS category,
+        r.prep_time_minutes,
+        r.cook_time_minutes,
+        r.difficulty,
+        r.servings
+      FROM public.recipes r
+      LEFT JOIN public.recipe_categories c ON c.id = r.category_id
+      WHERE r.published = true
+      ORDER BY r.created_at DESC
+    ` as Recipe[];
+  } catch (error) {
+    console.error("Não foi possível carregar as receitas do Neon:", error);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const recipes = await getRecipes();
+
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white">
       <header className="border-b border-white/10">
@@ -37,31 +84,46 @@ export default function Home() {
         </div>
         <div className="relative rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-6 md:p-10">
           <div className="absolute right-6 top-6 rounded-full bg-red-600/15 p-3 text-red-400"><ChefHat size={24}/></div>
-          <div className="mb-4 text-sm font-medium text-zinc-400">SUA PRÓXIMA RECEITA</div>
-          <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-gradient-to-br from-red-950 via-zinc-900 to-zinc-800 text-8xl">🍝</div>
-          <div className="mt-5 flex items-center justify-between">
-            <div><h2 className="text-xl font-bold">Macarrão fácil</h2><p className="mt-1 text-sm text-zinc-400">Uma receita para começar bem.</p></div>
-            <span className="flex items-center gap-1 text-sm text-zinc-400"><Clock3 size={16}/> 20 min</span>
+          <div className="mb-4 text-sm font-medium text-zinc-400">RECEITAS DA RECEITARIA</div>
+          <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-gradient-to-br from-red-950 via-zinc-900 to-zinc-800 text-8xl">🍲</div>
+          <div className="mt-5">
+            <h2 className="text-xl font-bold">Inspire-se na cozinha</h2>
+            <p className="mt-1 text-sm text-zinc-400">Novas receitas serão exibidas aqui quando forem cadastradas.</p>
           </div>
         </div>
       </section>
 
       <section id="categorias" className="mx-auto max-w-7xl px-5 py-10">
         <div><p className="text-sm font-semibold text-red-500">EXPLORE</p><h2 className="mt-2 text-2xl font-bold md:text-3xl">O que você quer preparar?</h2></div>
-        <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-          {categories.map((category) => <a key={category} href="#receitas" className="rounded-xl border border-white/10 bg-zinc-900 px-4 py-5 text-left font-semibold transition hover:border-red-500/50 hover:bg-zinc-800">{category}<span className="mt-2 block text-sm font-normal text-zinc-500">Ver receitas →</span></a>)}
+        <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+          {categories.map((category) => <a key={category.slug} href="#receitas" className="rounded-xl border border-white/10 bg-zinc-900 px-4 py-5 text-left font-semibold transition hover:border-red-500/50 hover:bg-zinc-800">{category.label}<span className="mt-2 block text-sm font-normal text-zinc-500">Ver receitas →</span></a>)}
         </div>
       </section>
 
       <section id="receitas" className="mx-auto max-w-7xl px-5 py-14">
-        <div className="flex items-end justify-between"><div><p className="text-sm font-semibold text-red-500">PARA INICIANTES</p><h2 className="mt-2 text-2xl font-bold md:text-3xl">Receitas para começar</h2></div><Search className="text-zinc-500"/></div>
-        <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {recipes.map((recipe) => <article key={recipe.name} className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
-            <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-950 text-6xl">{recipe.emoji}</div>
-            <div className="p-5"><div className="flex items-center justify-between text-xs text-zinc-500"><span>{recipe.category}</span><span>{recipe.time}</span></div><h3 className="mt-2 text-lg font-bold">{recipe.name}</h3><p className="mt-1 text-sm text-zinc-400">Passo a passo simples para iniciantes.</p><div className="mt-4 flex items-center justify-between"><span className="rounded-full bg-green-500/10 px-2.5 py-1 text-xs text-green-400">{recipe.difficulty}</span><Heart size={18} className="text-zinc-500"/></div></div>
-          </article>)}
-        </div>
-        <p className="mt-5 text-center text-sm text-zinc-500">Receitas organizadas para facilitar seu dia a dia na cozinha.</p>
+        <div className="flex items-end justify-between"><div><p className="text-sm font-semibold text-red-500">RECEITAS CADASTRADAS</p><h2 className="mt-2 text-2xl font-bold md:text-3xl">Receitas para preparar</h2></div><Search className="text-zinc-500"/></div>
+        {recipes.length === 0 ? (
+          <div className="mt-7 rounded-2xl border border-white/10 bg-zinc-900 p-8 text-center">
+            <ChefHat className="mx-auto text-red-500" size={36}/>
+            <h3 className="mt-4 text-lg font-bold">Ainda não há receitas publicadas</h3>
+            <p className="mt-2 text-sm text-zinc-400">As receitas serão mostradas aqui assim que forem adicionadas ao banco de dados.</p>
+          </div>
+        ) : (
+          <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {recipes.map((recipe) => {
+              const totalTime = (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0);
+              return <article key={recipe.id} className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
+                <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-red-950 via-zinc-900 to-zinc-950 text-6xl">🍽️</div>
+                <div className="p-5">
+                  <div className="flex items-center justify-between text-xs text-zinc-500"><span>{recipe.category ?? "Receita"}</span>{totalTime > 0 && <span>{totalTime} min</span>}</div>
+                  <h3 className="mt-2 text-lg font-bold">{recipe.title}</h3>
+                  <p className="mt-1 text-sm text-zinc-400">{recipe.description ?? "Confira os ingredientes e o modo de preparo."}</p>
+                  <div className="mt-4 flex items-center justify-between text-sm text-zinc-400"><span>{recipe.difficulty}</span><span>{recipe.servings} porção(ões)</span></div>
+                </div>
+              </article>;
+            })}
+          </div>
+        )}
       </section>
 
       <footer className="border-t border-white/10 px-5 py-8 text-center text-sm text-zinc-500">© {new Date().getFullYear()} Receitaria. Cozinhar pode ser simples.</footer>
