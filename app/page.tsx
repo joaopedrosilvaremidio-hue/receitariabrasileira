@@ -68,7 +68,7 @@ export default async function Home() {
       <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{recipes.map(r=>{const total=(r.prep_time_minutes??0)+(r.cook_time_minutes??0);return <Link href={`/receita/${r.slug}`} key={r.id} className="group block overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 transition hover:-translate-y-1 hover:border-red-500/50 hover:shadow-xl hover:shadow-red-950/20">
         {r.image_url ? <img src={r.image_url} alt={r.title} className="aspect-[16/9] w-full object-cover"/> : <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-red-950 via-zinc-900 to-zinc-950 text-6xl">🍽️</div>}
         <div className="p-5"><div className="flex items-center justify-between text-xs text-zinc-500"><span>{r.category||"Receita"}</span>{total>0&&<span>{total} min</span>}</div><h3 className="mt-2 text-lg font-bold">{r.title}</h3><p className="mt-1 text-sm text-zinc-400">{r.description||"Confira os ingredientes e o modo de preparo."}</p><div className="mt-4 flex items-center justify-between text-sm text-zinc-400"><span>{r.difficulty}</span><span>{r.servings} porção(ões)</span></div></div>
-      </article>})}</div>}
+      <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-4 text-sm font-semibold text-red-400">Ver receita completa <ArrowRight size={16}/></div></Link>})}</div>}
     </section>
     <footer className="border-t border-white/10 px-5 py-8 text-center text-sm text-zinc-500">© {new Date().getFullYear()} Receitaria. Cozinhar pode ser simples.</footer>
   </main>;
