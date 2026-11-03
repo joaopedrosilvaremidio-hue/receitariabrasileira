@@ -72,7 +72,7 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/recipes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         title: form.title, description: form.description, category_id: form.category_id,
-        prep_time_minutes: form.prep_time_minutes, cook_time_minutes: form.cook_time_minutes,
+        prep_time_minutes: form.prep_time_minutes, cook_time_minutes: "0",
         servings: form.servings, difficulty: form.difficulty, image_url: form.image_url,
         ingredients, steps, published: form.published,
       })});
@@ -146,20 +146,25 @@ export default function AdminPage() {
 
       {showForm && <form onSubmit={saveRecipe} className="mb-8 space-y-5 rounded-2xl border border-white/10 bg-zinc-900 p-5 md:p-7">
         <h2 className="text-xl font-bold">Cadastrar nova receita</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm">Nome da receita *<input className={inputClass+" mt-2"} value={form.title} onChange={e=>setForm({...form,title:e.target.value})} required/></label>
-          <label className="text-sm">Categoria<select className={inputClass+" mt-2"} value={form.category_id} onChange={e=>setForm({...form,category_id:e.target.value})}><option value="">Sem categoria</option>{categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
-        </div>
-        <label className="block text-sm">Descrição<textarea className={inputClass+" mt-2"} rows={2} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/></label>
-        <label className="block text-sm">URL da imagem (opcional)<input className={inputClass+" mt-2"} type="url" placeholder="https://..." value={form.image_url} onChange={e=>setForm({...form,image_url:e.target.value})}/></label>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <label className="text-sm">Preparo (min)<input className={inputClass+" mt-2"} type="number" min="0" value={form.prep_time_minutes} onChange={e=>setForm({...form,prep_time_minutes:e.target.value})}/></label>
-          <label className="text-sm">Cozimento (min)<input className={inputClass+" mt-2"} type="number" min="0" value={form.cook_time_minutes} onChange={e=>setForm({...form,cook_time_minutes:e.target.value})}/></label>
-          <label className="text-sm">Porções<input className={inputClass+" mt-2"} type="number" min="1" value={form.servings} onChange={e=>setForm({...form,servings:e.target.value})}/></label>
-          <label className="text-sm">Dificuldade<select className={inputClass+" mt-2"} value={form.difficulty} onChange={e=>setForm({...form,difficulty:e.target.value})}><option>fácil</option><option>médio</option><option>difícil</option></select></label>
-        </div>
-        <label className="block text-sm">Ingredientes (uma linha por ingrediente; use &quot;quantidade - ingrediente&quot;)<textarea className={inputClass+" mt-2"} rows={5} placeholder={"2 unidades - ovos\n1 xícara - farinha"} value={form.ingredientsText} onChange={e=>setForm({...form,ingredientsText:e.target.value})}/></label>
-        <label className="block text-sm">Modo de preparo (uma etapa por linha)<textarea className={inputClass+" mt-2"} rows={6} placeholder={"Quebre os ovos em uma tigela.\nMisture os ingredientes.\nLeve ao fogo."} value={form.stepsText} onChange={e=>setForm({...form,stepsText:e.target.value})}/></label>
+        <section className="space-y-4 rounded-xl border border-white/10 bg-zinc-950/50 p-4 md:p-5">
+          <h3 className="font-semibold text-white">Informações da receita</h3>
+          <label className="block text-sm">Nome da receita *<input className={inputClass+" mt-2"} value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="Ex.: Bolo de cenoura" required/></label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="text-sm">Tempo (minutos)<input className={inputClass+" mt-2"} type="number" min="0" value={form.prep_time_minutes} onChange={e=>setForm({...form,prep_time_minutes:e.target.value})} placeholder="Ex.: 40"/></label>
+            <label className="text-sm">Porção<input className={inputClass+" mt-2"} type="number" min="1" value={form.servings} onChange={e=>setForm({...form,servings:e.target.value})} placeholder="Ex.: 6"/></label>
+          </div>
+          <label className="block text-sm">Descrição<textarea className={inputClass+" mt-2"} rows={3} value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Descreva a receita em poucas palavras."/></label>
+        </section>
+        <section className="space-y-3 rounded-xl border border-white/10 bg-zinc-950/50 p-4 md:p-5">
+          <h3 className="font-semibold text-white">Ingredientes</h3>
+          <p className="text-xs text-zinc-400">Digite um ingrediente por linha. Se quiser, informe a quantidade antes do hífen.</p>
+          <textarea className={inputClass} rows={6} placeholder={"2 unidades - ovos\n1 xícara - farinha"} value={form.ingredientsText} onChange={e=>setForm({...form,ingredientsText:e.target.value})}/>
+        </section>
+        <section className="space-y-3 rounded-xl border border-white/10 bg-zinc-950/50 p-4 md:p-5">
+          <h3 className="font-semibold text-white">Modo de preparo</h3>
+          <p className="text-xs text-zinc-400">Escreva cada etapa em uma linha, na ordem correta.</p>
+          <textarea className={inputClass} rows={7} placeholder={"1. Misture os ingredientes.\n2. Leve ao forno.\n3. Aguarde e sirva."} value={form.stepsText} onChange={e=>setForm({...form,stepsText:e.target.value})}/>
+        </section>
         <label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={form.published} onChange={e=>setForm({...form,published:e.target.checked})}/> Publicar imediatamente no site</label>
         <button disabled={busy} className="rounded-xl bg-red-600 px-6 py-3 font-semibold hover:bg-red-700 disabled:opacity-60">{busy ? "Salvando…" : "Salvar receita"}</button>
       </form>}
