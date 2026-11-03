@@ -35,7 +35,16 @@ export function verifySessionToken(token: string | undefined): AdminSession | nu
   } catch { return null; }
 }
 export async function getAdminSession(): Promise<AdminSession|null> {
-  const cookieStore=await cookies(); return verifySessionToken(cookieStore.get(COOKIE_NAME)?.value);
+  const cookieStore=await cookies();
+  const session=verifySessionToken(cookieStore.get(COOKIE_NAME)?.value);
+  if(!session) return null;
+  if(session.role==="owner") return session;
+  try {
+    const sql=await getAdminDb();
+    const rows=await sql`SELECT id, username, display_name FROM public.admin_users WHERE id=${session.id} LIMIT 1`;
+    if(!rows[0]) return null;
+    return {id:String(rows[0].id),role:"admin",username:String(rows[0].username),name:String(rows[0].display_name)};
+  } catch { return null; }
 }
 export async function isAdmin() { return Boolean(await getAdminSession()); }
 export async function isOwner() { return (await getAdminSession())?.role==="owner"; }
