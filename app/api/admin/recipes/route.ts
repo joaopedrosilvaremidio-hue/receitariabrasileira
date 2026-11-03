@@ -75,10 +75,41 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
   try {
-    const { id, published } = await request.json();
+    const body = await request.json();
+    const { id } = body;
     if (!id) return NextResponse.json({ error: "ID da receita ausente." }, { status: 400 });
     const sql = db();
-    await sql`UPDATE public.recipes SET published = ${Boolean(published)}, updated_at = now() WHERE id = ${id}`;
+
+    // Mantém a ação rápida de publicar/despublicar.
+    if (typeof body.published === "boolean" && !("title" in body)) {
+      await sql`UPDATE public.recipes SET published = ${body.published}, updated_at = now() WHERE id = ${id}`;
+      return NextResponse.json({ success: true });
+    }
+
+    const title = String(body.title ?? "").trim();
+    if (!title) return NextResponse.json({ error: "Informe o título da receita." }, { status: 400 });
+    const prep = body.prep_time_minutes === "" || body.prep_time_minutes == null ? null : Number(body.prep_time_minutes);
+    const cook = body.cook_time_minutes === "" || body.cook_time_minutes == null ? null : Number(body.cook_time_minutes);
+    const servings = Math.max(1, Number(body.servings) || 1);
+    await sql`UPDATE public.recipes SET title = ${title}, description = ${String(body.description ?? "").trim() || null},
+      category_id = ${body.category_id || null}, prep_time_minutes = ${prep}, cook_time_minutes = ${cook},
+      servings = ${servings}, difficulty = ${body.difficulty || "fácil"}, image_url = ${String(body.image_url ?? "").trim() || null},
+      published = ${Boolean(body.published)}, updated_at = now() WHERE id = ${id}`;
+
+    await sql`DELETE FROM public.recipe_ingredients WHERE recipe_id = ${id}`;
+    await sql`DELETE FROM public.recipe_steps WHERE recipe_id = ${id}`;
+    const ingredients = Array.isArray(body.ingredients) ? body.ingredients : [];
+    for (let i = 0; i < ingredients.length; i++) {
+      const item = ingredients[i];
+      if (String(item.name ?? "").trim()) {
+        await sql`INSERT INTO public.recipe_ingredients (recipe_id, ingredient_name, quantity, sort_order)
+          VALUES (${id}, ${String(item.name).trim()}, ${String(item.quantity ?? "").trim() || null}, ${i})`;
+      }
+    }
+    const steps = Array.isArray(body.steps) ? body.steps : [];
+    for (let i = 0; i < steps.length; i++) {
+      if (String(steps[i]).trim()) await sql`INSERT INTO public.recipe_steps (recipe_id, instruction, sort_order) VALUES (${id}, ${String(steps[i]).trim()}, ${i})`;
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
