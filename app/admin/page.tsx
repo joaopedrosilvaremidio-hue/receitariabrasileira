@@ -5,10 +5,18 @@ import Link from "next/link";
 import { ChefHat, LogOut, Plus, Trash2, Eye, EyeOff, LoaderCircle, Users } from "lucide-react";
 
 type Category = { id: string; name: string; slug: string };
-type Recipe = { id: string; title: string; description: string | null; category: string | null; published: boolean; created_at: string };\ntype AdminUser = { id: string; username: string; display_name: string; created_at: string };
+type Recipe = { id: string; title: string; description: string | null; category: string | null; published: boolean; created_at: string };
+type AdminUser = { id: string; username: string; display_name: string; created_at: string };
 
 export default function AdminPage() {
-  const [password, setPassword] = useState("");\n  const [username, setUsername] = useState("");\n  const [role, setRole] = useState<"owner" | "admin" | "">("");\n  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);\n  const [adminName, setAdminName] = useState("");\n  const [adminUsername, setAdminUsername] = useState("");\n  const [adminPassword, setAdminPassword] = useState("");\n  const [showAdmins, setShowAdmins] = useState(false);
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [role, setRole] = useState<"owner" | "admin" | "">("");
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [adminName, setAdminName] = useState("");
+  const [adminUsername, setAdminUsername] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [showAdmins, setShowAdmins] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
