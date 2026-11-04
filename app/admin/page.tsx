@@ -16,6 +16,8 @@ export default function AdminPage() {
   const [adminName, setAdminName] = useState("");
   const [adminUsername, setAdminUsername] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteName, setInviteName] = useState("");
   const [showAdmins, setShowAdmins] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -161,7 +163,7 @@ export default function AdminPage() {
   if (!loggedIn) return <main className="flex min-h-screen items-center justify-center bg-[#0a0a0a] px-4 text-white">
     <form onSubmit={login} className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-900 p-8">
       <div className="mb-5 flex items-center gap-3"><span className="rounded-xl bg-red-600 p-3"><ChefHat/></span><div><h1 className="text-2xl font-bold">Painel administrativo</h1><p className="text-sm text-zinc-400">Receitaria</p></div></div>
-      <label className="mb-2 block text-sm text-zinc-300">Usuário (deixe vazio para usar a senha principal)</label><input className={inputClass+" mb-4"} autoComplete="username" value={username} onChange={e=>setUsername(e.target.value)} placeholder="nome de usuário"/><label className="mb-2 block text-sm text-zinc-300">Senha de administrador</label>
+      <label className="mb-2 block text-sm text-zinc-300">E-mail (deixe vazio para usar a senha principal)</label><input className={inputClass+" mb-4"} autoComplete="username" value={username} onChange={e=>setUsername(e.target.value)} placeholder="seuemail@exemplo.com"/><label className="mb-2 block text-sm text-zinc-300">Senha de administrador</label>
       <input className={inputClass} type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required/>
       {message && <p className="mt-3 text-sm text-red-400">{message}</p>}
       <button disabled={busy} className="mt-5 w-full rounded-xl bg-red-600 px-4 py-3 font-semibold hover:bg-red-700 disabled:opacity-60">{busy ? "Entrando…" : "Entrar"}</button>
@@ -184,14 +186,19 @@ export default function AdminPage() {
         {showAdmins && <div className="mt-5 space-y-4">
           <form className="grid gap-3 md:grid-cols-4" onSubmit={async(e)=>{e.preventDefault();setBusy(true);setMessage("");try{const res=await fetch("/api/admin/users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:adminName,username:adminUsername,password:adminPassword})});const data=await res.json();if(!res.ok)throw new Error(data.error||"Falha ao criar.");setMessage("Administrador criado.");setAdminName("");setAdminUsername("");setAdminPassword("");const list=await fetch("/api/admin/users");setAdminUsers((await list.json()).users||[]);}catch(err){setMessage(err instanceof Error?err.message:"Erro ao criar conta.");}finally{setBusy(false);}}}>
             <input className={inputClass} placeholder="Nome" value={adminName} onChange={e=>setAdminName(e.target.value)} required/>
-            <input className={inputClass} placeholder="Usuário (ex.: maria)" value={adminUsername} onChange={e=>setAdminUsername(e.target.value)} required/>
+            <input className={inputClass} placeholder="E-mail do administrador" type="email" value={adminUsername} onChange={e=>setAdminUsername(e.target.value)} required/>
             <input className={inputClass} type="password" minLength={10} placeholder="Senha (mín. 10 caracteres)" value={adminPassword} onChange={e=>setAdminPassword(e.target.value)} required/>
             <button disabled={busy} className="rounded-xl bg-red-600 px-4 py-3 font-semibold disabled:opacity-60">{busy?"Criando…":"Adicionar administrador"}</button>
           </form>
           <div className="divide-y divide-white/10 rounded-xl border border-white/10">
-            {adminUsers.length===0?<p className="p-4 text-sm text-zinc-400">Nenhum administrador adicional cadastrado.</p>:adminUsers.map(user=><div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div><p className="font-medium">{user.display_name}</p><p className="text-sm text-zinc-400">@{user.username}</p></div><button onClick={async()=>{if(!window.confirm("Remover o acesso de "+user.display_name+"?"))return;const res=await fetch("/api/admin/users",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:user.id})});const data=await res.json();if(!res.ok){setMessage(data.error||"Falha ao remover.");return;}setAdminUsers(adminUsers.filter(x=>x.id!==user.id));setMessage("Administrador removido.");}} className="rounded-lg border border-red-500/30 px-3 py-2 text-sm text-red-400">Remover</button></div>)}
+            {adminUsers.length===0?<p className="p-4 text-sm text-zinc-400">Nenhum administrador adicional cadastrado.</p>:adminUsers.map(user=><div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div><p className="font-medium">{user.display_name}</p><p className="text-sm text-zinc-400">{user.username}</p></div><button onClick={async()=>{if(!window.confirm("Remover o acesso de "+user.display_name+"?"))return;const res=await fetch("/api/admin/users",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:user.id})});const data=await res.json();if(!res.ok){setMessage(data.error||"Falha ao remover.");return;}setAdminUsers(adminUsers.filter(x=>x.id!==user.id));setMessage("Administrador removido.");}} className="rounded-lg border border-red-500/30 px-3 py-2 text-sm text-red-400">Remover</button></div>)}
           </div>
-          <p className="text-xs text-zinc-500">Os administradores adicionais podem gerenciar receitas, mas não podem gerenciar contas.</p>
+          <form className="grid gap-3 rounded-xl border border-white/10 p-4 md:grid-cols-3" onSubmit={async(e)=>{e.preventDefault();setBusy(true);setMessage("");try{const res=await fetch("/api/admin/invites",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:inviteName,email:inviteEmail})});const data=await res.json();if(!res.ok)throw new Error(data.error||"Falha ao enviar convite.");setMessage("Convite enviado por e-mail.");setInviteName("");setInviteEmail("");}catch(err){setMessage(err instanceof Error?err.message:"Erro ao enviar convite.");}finally{setBusy(false);}}}>
+            <input className={inputClass} placeholder="Nome para convite" value={inviteName} onChange={e=>setInviteName(e.target.value)} required/>
+            <input className={inputClass} type="email" placeholder="E-mail para convite" value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} required/>
+            <button disabled={busy} className="rounded-xl border border-red-500/50 px-4 py-3 font-semibold disabled:opacity-60">{busy?"Enviando…":"Enviar convite por e-mail"}</button>
+          </form>
+          <p className="text-xs text-zinc-500">Cadastro direto: você define a senha. Convite: a pessoa recebe e-mail e cria a própria senha. Administradores podem gerenciar receitas, mas não outras contas.</p>
         </div>}
       </section>}
       <section className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-zinc-900 p-5">
