@@ -190,10 +190,10 @@ export default function AdminPage() {
             <input className={inputClass} type="password" minLength={10} placeholder="Senha (mín. 10 caracteres)" value={adminPassword} onChange={e=>setAdminPassword(e.target.value)} required/>
             \n            <button disabled={busy} className="rounded-xl bg-red-600 px-4 py-3 font-semibold disabled:opacity-60">{busy?"Criando…":"Adicionar administrador"}</button>
           </form>
-          <div className="divide-y divide-white/10 rounded-xl border border-white/10">
+          {whatsappNotice && <a href={whatsappNotice} target="_blank" rel="noreferrer" className="block rounded-xl bg-green-600 px-4 py-3 text-center font-semibold text-white">Avisar pelo WhatsApp</a>}\n          <div className="divide-y divide-white/10 rounded-xl border border-white/10">
             {adminUsers.length===0?<p className="p-4 text-sm text-zinc-400">Nenhum administrador adicional cadastrado.</p>:adminUsers.map(user=><div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div><p className="font-medium">{user.display_name}</p><p className="text-sm text-zinc-400">{user.username}</p></div><button onClick={async()=>{if(!window.confirm("Remover o acesso de "+user.display_name+"?"))return;const res=await fetch("/api/admin/users",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:user.id})});const data=await res.json();if(!res.ok){setMessage(data.error||"Falha ao remover.");return;}setAdminUsers(adminUsers.filter(x=>x.id!==user.id));setMessage("Administrador removido.");}} className="rounded-lg border border-red-500/30 px-3 py-2 text-sm text-red-400">Remover</button></div>)}
           </div>
-          <p className="text-xs text-zinc-500">Cadastro direto: informe o e-mail da pessoa e defina uma senha. Não precisa confirmar o e-mail nem usar o Resend. Administradores podem gerenciar receitas, mas não outras contas.</p>
+          <p className="text-xs text-zinc-500">Cadastro direto: informe o WhatsApp com DDI e DDD e defina uma senha. A pessoa usará o número como login. Administradores podem gerenciar receitas, mas não outras contas.</p>
         </div>}
       </section>}
       <section className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-zinc-900 p-5">
