@@ -184,14 +184,14 @@ export default function AdminPage() {
         {showAdmins && <div className="mt-5 space-y-4">
           <form className="grid gap-3 md:grid-cols-4" onSubmit={async(e)=>{e.preventDefault();setBusy(true);setMessage("");try{const res=await fetch("/api/admin/users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:adminName,username:adminUsername,password:adminPassword})});const data=await res.json();if(!res.ok)throw new Error(data.error||"Falha ao criar.");setMessage("Administrador criado.");setAdminName("");setAdminUsername("");setAdminPassword("");const list=await fetch("/api/admin/users");setAdminUsers((await list.json()).users||[]);}catch(err){setMessage(err instanceof Error?err.message:"Erro ao criar conta.");}finally{setBusy(false);}}}>
             <input className={inputClass} placeholder="Nome" value={adminName} onChange={e=>setAdminName(e.target.value)} required/>
-            <input className={inputClass} placeholder="E-mail do administrador" type="email" value={adminUsername} onChange={e=>setAdminUsername(e.target.value)} required/>
+            <input className={inputClass} placeholder="Usuário (pode ser qualquer nome)" type="text" value={adminUsername} onChange={e=>setAdminUsername(e.target.value)} required/>
             <input className={inputClass} type="password" minLength={10} placeholder="Senha (mín. 10 caracteres)" value={adminPassword} onChange={e=>setAdminPassword(e.target.value)} required/>
             <button disabled={busy} className="rounded-xl bg-red-600 px-4 py-3 font-semibold disabled:opacity-60">{busy?"Criando…":"Adicionar administrador"}</button>
           </form>
           <div className="divide-y divide-white/10 rounded-xl border border-white/10">
             {adminUsers.length===0?<p className="p-4 text-sm text-zinc-400">Nenhum administrador adicional cadastrado.</p>:adminUsers.map(user=><div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div><p className="font-medium">{user.display_name}</p><p className="text-sm text-zinc-400">{user.username}</p></div><button onClick={async()=>{if(!window.confirm("Remover o acesso de "+user.display_name+"?"))return;const res=await fetch("/api/admin/users",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:user.id})});const data=await res.json();if(!res.ok){setMessage(data.error||"Falha ao remover.");return;}setAdminUsers(adminUsers.filter(x=>x.id!==user.id));setMessage("Administrador removido.");}} className="rounded-lg border border-red-500/30 px-3 py-2 text-sm text-red-400">Remover</button></div>)}
           </div>
-          <p className="text-xs text-zinc-500">Cadastro direto: informe o e-mail, defina a senha e crie a conta sem validação por e-mail. Administradores podem gerenciar receitas, mas não outras contas.</p>
+          <p className="text-xs text-zinc-500">Cadastro direto: escolha um usuário (não precisa ser e-mail), defina a senha e crie a conta sem confirmação. Administradores podem gerenciar receitas, mas não outras contas.</p>
         </div>}
       </section>}
       <section className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-zinc-900 p-5">
