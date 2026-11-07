@@ -21,7 +21,7 @@ export async function POST(request:Request) {
     const username=String(body.username??"").trim().toLowerCase();
     const name=String(body.name??"").trim();
     const password=String(body.password??"");
-    if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(username)) return NextResponse.json({error:"Informe um e-mail válido."},{status:400});
+    if(username.length<3||username.length>80) return NextResponse.json({error:"Informe um usuário de 3 a 80 caracteres."},{status:400});
     if(name.length<2||name.length>80) return NextResponse.json({error:"Informe um nome de 2 a 80 caracteres."},{status:400});
     if(password.length<10) return NextResponse.json({error:"A senha deve ter pelo menos 10 caracteres."},{status:400});
     const sql=await getAdminDb();
@@ -29,7 +29,7 @@ export async function POST(request:Request) {
     return NextResponse.json({user:rows[0]}, {status:201});
   } catch(error) {
     const msg=String(error);
-    if(msg.includes("unique")||msg.includes("duplicate")) return NextResponse.json({error:"Esse e-mail já existe."},{status:409});
+    if(msg.includes("unique")||msg.includes("duplicate")) return NextResponse.json({error:"Esse usuário já existe."},{status:409});
     console.error(error); return NextResponse.json({error:"Não foi possível criar a conta."},{status:500});
   }
 }
