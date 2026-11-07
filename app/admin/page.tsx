@@ -16,8 +16,6 @@ export default function AdminPage() {
   const [adminName, setAdminName] = useState("");
   const [adminUsername, setAdminUsername] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteName, setInviteName] = useState("");
   const [showAdmins, setShowAdmins] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -193,12 +191,7 @@ export default function AdminPage() {
           <div className="divide-y divide-white/10 rounded-xl border border-white/10">
             {adminUsers.length===0?<p className="p-4 text-sm text-zinc-400">Nenhum administrador adicional cadastrado.</p>:adminUsers.map(user=><div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div><p className="font-medium">{user.display_name}</p><p className="text-sm text-zinc-400">{user.username}</p></div><button onClick={async()=>{if(!window.confirm("Remover o acesso de "+user.display_name+"?"))return;const res=await fetch("/api/admin/users",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:user.id})});const data=await res.json();if(!res.ok){setMessage(data.error||"Falha ao remover.");return;}setAdminUsers(adminUsers.filter(x=>x.id!==user.id));setMessage("Administrador removido.");}} className="rounded-lg border border-red-500/30 px-3 py-2 text-sm text-red-400">Remover</button></div>)}
           </div>
-          <form className="grid gap-3 rounded-xl border border-white/10 p-4 md:grid-cols-3" onSubmit={async(e)=>{e.preventDefault();setBusy(true);setMessage("");try{const res=await fetch("/api/admin/invites",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:inviteName,email:inviteEmail})});const data=await res.json();if(!res.ok)throw new Error(data.error||"Falha ao enviar convite.");setMessage("Convite enviado por e-mail.");setInviteName("");setInviteEmail("");}catch(err){setMessage(err instanceof Error?err.message:"Erro ao enviar convite.");}finally{setBusy(false);}}}>
-            <input className={inputClass} placeholder="Nome para convite" value={inviteName} onChange={e=>setInviteName(e.target.value)} required/>
-            <input className={inputClass} type="email" placeholder="E-mail para convite" value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} required/>
-            <button disabled={busy} className="rounded-xl border border-red-500/50 px-4 py-3 font-semibold disabled:opacity-60">{busy?"Enviando…":"Enviar convite por e-mail"}</button>
-          </form>
-          <p className="text-xs text-zinc-500">Cadastro direto: você define a senha. Convite: a pessoa recebe e-mail e cria a própria senha. Administradores podem gerenciar receitas, mas não outras contas.</p>
+          <p className="text-xs text-zinc-500">Cadastro direto: informe o e-mail, defina a senha e crie a conta sem validação por e-mail. Administradores podem gerenciar receitas, mas não outras contas.</p>
         </div>}
       </section>}
       <section className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-zinc-900 p-5">
