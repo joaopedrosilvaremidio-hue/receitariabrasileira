@@ -18,10 +18,10 @@ export async function POST(request:Request) {
   if(session?.role!=="owner") return NextResponse.json({error:"Apenas o administrador principal pode criar contas."},{status:403});
   try {
     const body=await request.json();
-    const username=String(body.username??"").replace(/\\D/g,"");
+    const username=String(body.username??"").replace(/\D/g,"");
     const name=String(body.name??"").trim();
     const password=String(body.password??"");
-    if(username.length<3||username.length>254||! /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(username)) return NextResponse.json({error:"Informe um e-mail válido."},{status:400});
+    if(username.length<10||username.length>15) return NextResponse.json({error:"Informe um WhatsApp válido com DDI e DDD (10 a 15 dígitos)."},{status:400});
     if(name.length<2||name.length>80) return NextResponse.json({error:"Informe um nome de 2 a 80 caracteres."},{status:400});
     if(password.length<10) return NextResponse.json({error:"A senha deve ter pelo menos 10 caracteres."},{status:400});
     const sql=await getAdminDb();
