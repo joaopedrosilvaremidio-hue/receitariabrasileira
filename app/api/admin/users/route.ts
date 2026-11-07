@@ -21,7 +21,7 @@ export async function POST(request:Request) {
     const username=String(body.username??"").trim().toLowerCase();
     const name=String(body.name??"").trim();
     const password=String(body.password??"");
-    if(username.length<3||username.length>80) return NextResponse.json({error:"Informe um usuário de 3 a 80 caracteres."},{status:400});
+    if(username.length<3||username.length>254||! /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(username)) return NextResponse.json({error:"Informe um e-mail válido."},{status:400});
     if(name.length<2||name.length>80) return NextResponse.json({error:"Informe um nome de 2 a 80 caracteres."},{status:400});
     if(password.length<10) return NextResponse.json({error:"A senha deve ter pelo menos 10 caracteres."},{status:400});
     const sql=await getAdminDb();
