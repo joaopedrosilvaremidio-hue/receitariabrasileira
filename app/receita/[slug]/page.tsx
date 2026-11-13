@@ -1,4 +1,5 @@
 import Link from "next/link";
+import IngredientChecklist from "./ingredient-checklist";
 import { neon } from "@neondatabase/serverless";
 import { ChefHat, ArrowLeft, Clock3, Utensils, ListChecks } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -52,7 +53,7 @@ export default async function RecipeDetails({ params }: { params: Promise<{ slug
         <section className="h-fit rounded-2xl border border-white/10 bg-zinc-900 p-5 md:p-6">
           <h2 className="flex items-center gap-2 text-xl font-bold"><Utensils className="text-red-500"/> Ingredientes</h2>
           <p className="mt-1 text-sm text-zinc-500">Separe tudo antes de começar.</p>
-          {ingredients.length ? <ul className="mt-5 space-y-3">{ingredients.map((item,i)=><li key={i} className="flex gap-3 border-b border-white/10 pb-3 text-zinc-200"><span className="mt-1 h-4 w-4 shrink-0 rounded border border-red-500/60"/><span>{item.quantity ? item.quantity+" — " : ""}{item.ingredient_name}</span></li>)}</ul> : <p className="mt-4 text-sm text-zinc-400">Ingredientes ainda não cadastrados.</p>}
+          {ingredients.length ? <IngredientChecklist ingredients={ingredients.map(item => ({ name: item.ingredient_name, quantity: item.quantity }))}/> : <p className="mt-4 text-sm text-zinc-400">Ingredientes ainda não cadastrados.</p>}
         </section>
         <section className="rounded-2xl border border-white/10 bg-zinc-900 p-5 md:p-6">
           <h2 className="flex items-center gap-2 text-xl font-bold"><ListChecks className="text-red-500"/> Modo de preparo</h2>
