@@ -11,6 +11,12 @@ function db() {
   return neon(url);
 }
 
+function normalizeDifficulty(value: unknown) {
+  const difficulty = String(value ?? "fácil").trim().toLocaleLowerCase("pt-BR");
+  const normalized = difficulty === "média" ? "médio" : difficulty;
+  return ["fácil", "médio", "difícil"].includes(normalized) ? normalized : null;
+}
+
 export async function GET() {
   if (!(await isAdmin())) return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
   try {
@@ -41,6 +47,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const title = String(body.title ?? "").trim();
     if (!title) return NextResponse.json({ error: "Informe o título da receita." }, { status: 400 });
+    const difficulty = normalizeDifficulty(body.difficulty);
+    if (!difficulty) return NextResponse.json({ error: "Selecione uma dificuldade válida." }, { status: 400 });
     const slug = (String(body.slug || title).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + Math.random().toString(36).slice(2, 7));
     const prep = body.prep_time_minutes === "" || body.prep_time_minutes == null ? null : Number(body.prep_time_minutes);
     const cook = body.cook_time_minutes === "" || body.cook_time_minutes == null ? null : Number(body.cook_time_minutes);
@@ -49,7 +57,7 @@ export async function POST(request: Request) {
     const inserted = await sql`
       INSERT INTO public.recipes (title, slug, description, category_id, prep_time_minutes, cook_time_minutes, servings, difficulty, image_url, published)
       VALUES (${title}, ${slug}, ${String(body.description ?? "").trim() || null}, ${body.category_id || null},
-        ${prep}, ${cook}, ${servings}, ${body.difficulty || "fácil"}, ${String(body.image_url ?? "").trim() || null}, ${Boolean(body.published)})
+        ${prep}, ${cook}, ${servings}, ${difficulty}, ${String(body.image_url ?? "").trim() || null}, ${Boolean(body.published)})
       RETURNING id
     `;
     const recipeId = inserted[0].id;
@@ -88,12 +96,14 @@ export async function PATCH(request: Request) {
 
     const title = String(body.title ?? "").trim();
     if (!title) return NextResponse.json({ error: "Informe o título da receita." }, { status: 400 });
+    const difficulty = normalizeDifficulty(body.difficulty);
+    if (!difficulty) return NextResponse.json({ error: "Selecione uma dificuldade válida." }, { status: 400 });
     const prep = body.prep_time_minutes === "" || body.prep_time_minutes == null ? null : Number(body.prep_time_minutes);
     const cook = body.cook_time_minutes === "" || body.cook_time_minutes == null ? null : Number(body.cook_time_minutes);
     const servings = Math.max(1, Number(body.servings) || 1);
     await sql`UPDATE public.recipes SET title = ${title}, description = ${String(body.description ?? "").trim() || null},
       category_id = ${body.category_id || null}, prep_time_minutes = ${prep}, cook_time_minutes = ${cook},
-      servings = ${servings}, difficulty = ${body.difficulty || "fácil"}, image_url = ${String(body.image_url ?? "").trim() || null},
+      servings = ${servings}, difficulty = ${difficulty}, image_url = ${String(body.image_url ?? "").trim() || null},
       published = ${Boolean(body.published)}, updated_at = now() WHERE id = ${id}`;
 
     await sql`DELETE FROM public.recipe_ingredients WHERE recipe_id = ${id}`;
