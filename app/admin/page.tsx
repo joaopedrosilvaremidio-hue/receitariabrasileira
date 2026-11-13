@@ -98,7 +98,7 @@ export default function AdminPage() {
       category_id: recipe.category_id || "",
       prep_time_minutes: String(recipe.prep_time_minutes ?? 10),
       cook_time_minutes: "0",
-      difficulty: recipe.difficulty || "fácil",
+      difficulty: recipe.difficulty === "média" ? "médio" : recipe.difficulty || "fácil",
       image_url: recipe.image_url || "",
       ingredientsText: (recipe.ingredients || []).map(item => item.quantity ? `${item.quantity} - ${item.name}` : item.name).join("\n"),
       stepsText: (recipe.steps || []).join("\n"),
@@ -209,7 +209,7 @@ export default function AdminPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="text-sm">Categoria<select className={inputClass+" mt-2"} value={form.category_id} onChange={e=>setForm({...form,category_id:e.target.value})}><option value="">Sem categoria</option>{categories.map(category=><option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
             <label className="text-sm">Tempo (minutos)<input className={inputClass+" mt-2"} type="number" min="0" value={form.prep_time_minutes} onChange={e=>setForm({...form,prep_time_minutes:e.target.value})} placeholder="Ex.: 40"/></label>
-            <label className="text-sm">Dificuldade<select className={inputClass+" mt-2"} value={form.difficulty} onChange={e=>setForm({...form,difficulty:e.target.value})}><option value="fácil">Fácil</option><option value="média">Média</option><option value="difícil">Difícil</option></select></label>
+            <label className="text-sm">Dificuldade<select className={inputClass+" mt-2"} value={form.difficulty} onChange={e=>setForm({...form,difficulty:e.target.value})}><option value="fácil">Fácil</option><option value="médio">Média</option><option value="difícil">Difícil</option></select></label>
           </div>
           <label className="block text-sm">Descrição<textarea className={inputClass+" mt-2"} rows={3} value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Descreva a receita em poucas palavras."/></label>
         </section>
