@@ -13,7 +13,8 @@ export async function POST(request: Request) {
     } else {
       const sql = await getAdminDb();
       const rows = await sql`SELECT id, username, display_name, password_hash FROM public.admin_users`;
-      const matches = rows.filter((user: any) => verifyAdminPassword(password, String(user.password_hash)));
+      const adminRows = rows as { id: string; username: string; display_name: string; password_hash: string }[];
+      const matches = adminRows.filter((user) => verifyAdminPassword(password, user.password_hash));
       if (matches.length === 0) {
         return NextResponse.json({ error: "Senha incorreta." }, { status: 401 });
       }
