@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="112" fill="#fff0d8"/>
+<circle cx="256" cy="256" r="224" fill="none" stroke="#4b1708" stroke-width="13"/>
+<g fill="none" stroke="#4b1708" stroke-width="15" stroke-linecap="round" stroke-linejoin="round">
+<path d="M160 192c-39 0-58-28-58-57 0-35 29-61 66-54 12-43 48-68 89-68s77 25 89 68c37-7 66 19 66 54 0 29-19 57-58 57"/>
+<path d="M157 190v35m198-35v35M159 224c55-34 139-34 194 0"/>
+<path d="M145 365h52m170 0h52"/>
+<path d="M197 409l117-43"/>
+<path d="M309 367c38-43 79-43 87-29 9 16-23 66-72 78-21 5-35-14-15-49z"/>
+<path d="M312 367l76-27m-86 38 91-14m-98 24 89 1"/>
+</g>
+<text x="256" y="307" text-anchor="middle" fill="#4b1708" font-family="Georgia,serif" font-size="66" font-style="italic" font-weight="bold">Receitaria</text>
+</svg>
