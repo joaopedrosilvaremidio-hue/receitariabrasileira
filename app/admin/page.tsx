@@ -47,6 +47,18 @@ export default function AdminPage() {
     finally { setLoading(false); }
   }
 
+  useEffect(() => {
+    const manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement | null;
+    if (manifestLink) {
+      manifestLink.href = "/admin/manifest.webmanifest";
+    } else {
+      const link = document.createElement("link");
+      link.rel = "manifest";
+      link.href = "/admin/manifest.webmanifest";
+      document.head.appendChild(link);
+    }
+  }, []);
+
   useEffect(() => { load(); }, []);
 
   async function login(e: FormEvent) {
